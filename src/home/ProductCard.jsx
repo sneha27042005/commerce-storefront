@@ -4,18 +4,15 @@ import { CartContext } from "../CartContext.jsx";
 
 const ProductCard = ({ id, name, price, imageURL }) => {
 
-    const { items, setItems } = useContext(CartContext);
+    const { addItemToCart } = useContext(CartContext);
 
     const addToCart = () => {
-        setItems([
-            ...items,
-            {
-                id,
-                name,
-                price,
-                imageURL,
-            }
-        ]);
+        addItemToCart({
+            id,
+            name,
+            price,
+            imageURL,
+        });
     }
 
     return (
