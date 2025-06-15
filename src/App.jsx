@@ -6,6 +6,7 @@ import ProductPage from "./product";
 import Layout from "./Layout";
 import './style.css';
 import ProductContextProvider from "./CartContext.jsx";
+import MyCart from "./cart";
 
 const App = () => {
 
@@ -20,6 +21,8 @@ const App = () => {
                   <Routes>
                       {/* Define a route for the home page */}
                       <Route path="/" element={<HomePage />} />
+                      <Route path="/cart" element={<MyCart />} />
+
 
                       {/* Define a route for the product page with a dynamic 'id' parameter
                         this `id` will be accessible from the <ProductPage /> component
