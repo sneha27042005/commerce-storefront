@@ -1,19 +1,26 @@
-import {createContext, useEffect, useState} from "react";
-
+import { createContext, useEffect, useState } from "react";
 
 export const CartContext = createContext({
     items: [],
     addItemToCart: () => {},
     removeItemFromCart: () => {},
+    removeAllOfItem: () => {}, // Added to context definition
 });
 
 const ProductContextProvider = ({ children }) => {
-
     const [items, setItems] = useState([]);
 
     const updateItems = (update) => {
         localStorage.setItem("cart", JSON.stringify(update));
         setItems(update);
+    }
+
+    // Added removeAllOfItem function
+    const removeAllOfItem = (id) => {
+        if(items && items.length > 0){
+            const updatedItems = items.filter(item => item.id !== id);
+            updateItems(updatedItems);
+        }
     }
 
     const addItemToCart = (item) => {
@@ -60,7 +67,7 @@ const ProductContextProvider = ({ children }) => {
                         }
                     }
                     return i;
-                }).filter((i) => i.quantity > 0); // Filter out items with quantity 0 or less
+                }).filter((i) => i.quantity > 0);
                 updateItems(updatedItems);
             }
         }
@@ -74,10 +81,7 @@ const ProductContextProvider = ({ children }) => {
             }
         }
 
-        // Call it once on component mount
         getDataFromLocalStorage();
-
-        // Set up the event listener for changes from other tabs/windows
         window.addEventListener('storage', getDataFromLocalStorage)
 
         return () => {
@@ -90,11 +94,11 @@ const ProductContextProvider = ({ children }) => {
             items,
             addItemToCart,
             removeItemFromCart,
+            removeAllOfItem, // Added to context provider
         }}>
             {children}
         </CartContext.Provider>
     );
-
 };
 
 export default ProductContextProvider;
