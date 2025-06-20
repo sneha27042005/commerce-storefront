@@ -2,7 +2,10 @@ import React, { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { CartContext } from "../CartContext.jsx";
 
-const ProductCard = ({ id, name, price, imageURL, description }) => {
+// ✅ Helper to make product names into IDs like "mrf-bat"
+const slugify = (str) => str.toLowerCase().replace(/\s+/g, "-");
+
+const ProductCard = ({ id, name, price, imageURL, description, rating = 4.5 }) => {
   const { addItemToCart } = useContext(CartContext);
   const [popupMessage, setPopupMessage] = useState("");
   const [showPopup, setShowPopup] = useState(false);
@@ -29,38 +32,62 @@ const ProductCard = ({ id, name, price, imageURL, description }) => {
     setShowDetailsModal(false);
   };
 
+  const renderStars = (rating) => {
+    const fullStars = Math.floor(rating);
+    const halfStar = rating % 1 >= 0.5;
+    const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+
+    return (
+      <>
+        {[...Array(fullStars)].map((_, i) => (
+          <span key={`full-${i}`} className="text-yellow-500">★</span>
+        ))}
+        {halfStar && <span className="text-yellow-500">☆</span>}
+        {[...Array(emptyStars)].map((_, i) => (
+          <span key={`empty-${i}`} className="text-gray-300">★</span>
+        ))}
+      </>
+    );
+  };
+
   return (
-    <div className="relative bg-white rounded-lg shadow-md overflow-hidden border p-2">
+    <div
+      id={slugify(name)}  // ✅ This enables scroll-to by ID
+      className="relative bg-white rounded-2xl shadow-md border border-gray-200 p-4 hover:shadow-lg transition min-h-[450px]"
+    >
       <img 
         src={imageURL} 
         alt={name} 
         className="w-full h-48 object-cover cursor-pointer"
-        onClick={openDetailsModal}
       />
       <div className="p-4">
         <h2 className="text-lg font-semibold">{name}</h2>
-        <p className="text-teal font-bold">₹{price}</p>
+        <div className="flex items-center text-sm mt-1">
+          {renderStars(rating)}
+          <span className="ml-2 text-gray-500">({rating.toFixed(1)})</span>
+        </div>
+        <p className="text-teal font-bold mt-1">₹{price}</p>
         {description && (
           <p className="text-sm text-gray-600 mt-1 line-clamp-2">{description}</p>
         )}
-        <div className="flex gap-2 mt-4">
-        <button
-  onClick={addToCart}
-  className="bg-[#556b5a] text-gray-200 rounded px-3 py-2 hover:opacity-90 transition"
->
-  Add to cart
-</button>
-<button
-  onClick={openDetailsModal}
-  className="bg-[#1e4a4f] text-white rounded px-3 py-2 hover:opacity-90 transition"
->
-  More Details
-</button>
 
+        <div className="flex gap-2 mt-4">
+          <button
+            onClick={addToCart}
+            className="bg-[#556b5a] text-gray-200 rounded px-3 py-2 hover:opacity-90 transition"
+          >
+            Add to cart
+          </button>
+          <button
+            onClick={openDetailsModal}
+            className="bg-[#1e4a4f] text-white rounded px-3 py-2 hover:opacity-90 transition"
+          >
+            More Details
+          </button>
         </div>
       </div>
 
-      {/* Enhanced Popup with white background */}
+      {/* Popup */}
       {showPopup && (
         <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-white text-gray-800 px-6 py-3 rounded-lg shadow-xl z-50 animate-fade-in-out flex items-center space-x-2 border border-gray-200">
           <svg 
@@ -80,7 +107,7 @@ const ProductCard = ({ id, name, price, imageURL, description }) => {
         </div>
       )}
 
-      {/* Product Details Modal */}
+      {/* Modal */}
       {showDetailsModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div 
@@ -106,19 +133,22 @@ const ProductCard = ({ id, name, price, imageURL, description }) => {
                   />
                 </svg>
               </button>
-              
-            
-  <img 
-  src={imageURL}
-  alt={name}
-  className="w-full max-h-40 object-contain mb-2"
-/>
-
+              <img
+                src={imageURL}
+                alt={name}
+                className="w-full h-48 object-contain"
+              />
             </div>
             
             <div className="p-6">
               <div className="flex justify-between items-start">
-                <h2 className="text-2xl font-bold text-gray-800">{name}</h2>
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-800">{name}</h2>
+                  <div className="flex items-center mt-1">
+                    {renderStars(rating)}
+                    <span className="ml-2 text-gray-500">({rating.toFixed(1)})</span>
+                  </div>
+                </div>
                 <p className="text-xl font-bold text-pink-600">₹{price}</p>
               </div>
               
@@ -167,31 +197,37 @@ const ProductCard = ({ id, name, price, imageURL, description }) => {
         </div>
       )}
 
-      <style jsx>{`
+    
+      {/* existing JSX for the card … */}
+
+      {/* ─── Styles ─── */}
+      <style >{`
+        /* ✅ existing popup fade animation */
         @keyframes fade-in-out {
-          0% { 
-            opacity: 0; 
-            transform: translate(-50%, -20px); 
-          }
-          10% { 
-            opacity: 1; 
-            transform: translate(-50%, 0); 
-          }
-          90% { 
-            opacity: 1; 
-            transform: translate(-50%, 0); 
-          }
-          100% { 
-            opacity: 0; 
-            transform: translate(-50%, -20px); 
-          }
+          0%   { opacity: 0; transform: translate(-50%, -20px); }
+          10%  { opacity: 1; transform: translate(-50%, 0); }
+          90%  { opacity: 1; transform: translate(-50%, 0); }
+          100% { opacity: 0; transform: translate(-50%, -20px); }
         }
         .animate-fade-in-out {
           animation: fade-in-out 2s ease forwards;
+        }
+
+        /* ✅ NEW: product‑card highlight when searched */
+        .highlight {
+          animation: flash-border 1.5s ease-out;
+        }
+        @keyframes flash-border {
+          0%   { box-shadow: 0 0 0px 0   rgba(255, 204, 0, 0.9); }
+          50%  { box-shadow: 0 0 15px 6px rgba(255, 204, 0, 0.8); }
+          100% { box-shadow: 0 0 0px 0   rgba(255, 204, 0, 0); }
         }
       `}</style>
     </div>
   );
 };
+
+
+
 
 export default ProductCard;

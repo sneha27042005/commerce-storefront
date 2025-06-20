@@ -7,36 +7,29 @@ import Layout from "./Layout";
 import './style.css';
 import ProductContextProvider from "./CartContext.jsx";
 import MyCart from "./cart";
+import SignIn from "./SignIn";
+import SelectAddress from "./SelectAddress";
+import SearchResults from "./SearchResults"; // ✅ this must be correct
 
 const App = () => {
-
   return (
-      // Use BrowserRouter as the main router for your application
-      <BrowserRouter>
-          <HelmetProvider>
-              <ProductContextProvider>
-              {/* The Layout component will wrap all your routes, meaning it will always be present */}
-              <Layout>
-                  {/* Routes component is used to group individual Route components */}
-                  <Routes>
-                      {/* Define a route for the home page */}
-                      <Route path="/" element={<HomePage />} />
-                      <Route path="/cart" element={<MyCart />} />
+    <BrowserRouter>
+      <HelmetProvider>
+        <ProductContextProvider>
+          <Layout>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/cart" element={<MyCart />} />
+              <Route path="/product/:id" element={<ProductPage />} />
+              <Route path="/signin" element={<SignIn />} /> {/* ✅ Added properly */}
+              <Route path="/select-address" element={<SelectAddress />} />
+               <Route path="/search" element={<SearchResults />} />
+            </Routes>
+          </Layout>
+        </ProductContextProvider>
+      </HelmetProvider>
+    </BrowserRouter>
+  );
+};
 
-
-                      {/* Define a route for the product page with a dynamic 'id' parameter
-                        this `id` will be accessible from the <ProductPage /> component
-                        using the `useParms` hook
-                  */}
-                      <Route path="/product/:id" element={<ProductPage />} />
-
-                      {/* You can add more routes here as needed */}
-                  </Routes>
-              </Layout>
-              </ProductContextProvider>
-          </HelmetProvider>
-      </BrowserRouter>
-  )
-}
-
-export default App
+export default App;

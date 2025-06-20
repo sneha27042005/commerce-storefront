@@ -1,18 +1,25 @@
+
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import ProductCard from "./ProductCard.jsx";
 
 const HomePage = () => {
   const [products, setProducts] = useState([]);
+  const [error, setError] = useState(null);
 
-  // Fetch product data once when the component mounts
   const fetchProducts = async () => {
     try {
-      const response = await fetch("https://sheetdb.io/api/v1/6eo2rgbmyumqc");
+      const response = await fetch("https://sheetdb.io/api/v1/01hisgjwbg4xx");
+      console.log("API Response:", response);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
       const data = await response.json();
-      setProducts(data);        // [{ id, name, image, price, ... }, ...]
+      console.log("Parsed Data:", data);
+      setProducts(data);
     } catch (err) {
-      console.error("Failed to load products:", err);
+      console.error("Error:", err);
+      setError(err.message);
     }
   };
 
@@ -20,20 +27,25 @@ const HomePage = () => {
     fetchProducts();
   }, []);
 
-  return (
-        <div className="min-h-screen bg-[#d1a8a1] text-gray-800 font-sans">
-      <h1 className="font-bold text-2xl p-5">Products</h1>
+  console.log("Products State:", products);
 
-      <div className="flex flex-wrap mx-0">
-        {products.map((product) => (
-          <div key={product.id} className="w-full md:w-1/3 lg:w-1/4 p-2">
-            {/* Spread all fields, so ProductCard gets name, price, image, etc. */}
-            <ProductCard {...product} />
-          </div>
-        ))}
-      </div>
+  return (
+    <div className="min-h-screen bg-[#d1a8a1] text-gray-800 font-sans">
+      <h1 className="font-bold text-2xl p-5">Products</h1>
+      {error ? (
+        <p>Error: {error}</p>
+      ) : (
+        <div className="flex flex-wrap mx-0">
+          {Array.isArray(products) && products.map((product) => (
+            <div key={product.id} className="w-full md:w-1/3 lg:w-1/4 p-2">
+              <ProductCard {...product} />
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
 
-export default HomePage;
+export default HomePage;
+
