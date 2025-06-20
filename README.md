@@ -52,7 +52,7 @@ src/
    ```
 
 4. **Open your browser**
-   Navigate to `http://localhost:5173`
+   Navigate to 'http://cerulean-cannoli-fe35ef.netlify.app'
 
 ### Available Scripts
 
